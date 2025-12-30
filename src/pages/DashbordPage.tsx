@@ -1,6 +1,6 @@
 import { Chart, useChart } from "@chakra-ui/charts"
 import { Box } from "@chakra-ui/react"
-import { Cell, Pie, PieChart, Tooltip,LabelList } from "recharts"
+import { Cell, Pie, PieChart } from "recharts"
 
 export const DashboardPage=()=>{
     const chart = useChart({

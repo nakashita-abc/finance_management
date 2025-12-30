@@ -1,12 +1,12 @@
-import { AuthContext, AuthProvider } from "@/providers/AuthProvider";
+import { AuthContext } from "@/providers/AuthProvider";
 import type { user } from "@/types/user";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 
 //責務：ログイン情報が正しいか判定、ログイン情報の保持
 export const useAuth = () => {
     //ログイン情報
-    const [loginUser, setLoginUser] = useState<user>();
+    const [loginUser] = useState<user>();
     const context = useContext(AuthContext);
 
     if (!context) {

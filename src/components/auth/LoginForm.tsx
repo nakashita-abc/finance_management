@@ -4,7 +4,7 @@ import { PasswordInput } from "@/components/ui/password-input"
 import type { FC, MouseEventHandler } from "react"
 
 interface FormValues {
-    id: string
+    mailAddress: string
     password: string
 }
 
@@ -32,13 +32,13 @@ export const LoginForm:FC<props> = (props) => {
                 </Card.Header>
                 <Card.Body>
                     <Stack gap={5}>
-                        <Field.Root required invalid={!!errors.id}>
+                        <Field.Root required invalid={!!errors.mailAddress}>
                             <Field.Label>
-                                ID<FieldRequiredIndicator />
+                                メールアドレス<FieldRequiredIndicator />
                             </Field.Label>
-                            <Input placeholder="IDを入力してください"
-                                {...register("id")} />
-                            <Field.ErrorText>{errors.id?.message}</Field.ErrorText>
+                            <Input placeholder="メールアドレスを入力してください"
+                                {...register("mailAddress")} />
+                            <Field.ErrorText>{errors.mailAddress?.message}</Field.ErrorText>
                         </Field.Root>
 
                         <Field.Root required invalid={!!errors.password}>
