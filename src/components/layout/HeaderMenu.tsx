@@ -20,9 +20,9 @@ export const HeaderMenu = () => {
                             <Drawer.Title />
                         </Drawer.Header>
                         <Drawer.Body>
-                            <Link to="/dashbord">ダッシュボード</Link><br/>
+                            <Link to="/">ダッシュボード</Link><br/>
+                            <Link to="/expenseForm">支出登録</Link><br/>
                             <Link to="/expenseList">支出一覧</Link><br/>
-                            <Link to="/">ログアウト</Link>
                         </Drawer.Body>
                         <Drawer.CloseTrigger asChild>
                             <CloseButton size="sm" />

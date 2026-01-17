@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { DashboardPage } from './pages/DashbordPage'
 import { ExpenseListPage } from './pages/ExpenseListPage'
 import { ExpenseFormPage } from './pages/ExpenseFormPage'
+import { HomePage } from './pages/HomePage'
 import { Header } from './components/layout/Header'
 import '@aws-amplify/ui-react/styles.css';
 import { useAuth } from "react-oidc-context";
@@ -19,20 +20,25 @@ function App() {
   }
   const { setEmail } = context;
 
-  const signOutRedirect = () => {
-    const clientId = "22omuoadoaf3b2t1in154vjn9e";
-    const logoutUri = "http://localhost:5173/logout";
-    const cognitoDomain = "https://us-east-1huyvdb3aw.auth.us-east-1.amazoncognito.com";
-    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
-  };
+  const backToHome = () => {
+    auth.removeUser();
+    window.location.href = "/";
+  }
 
   if (auth.isLoading) {
     console.log("loading")
     return (
-      <VStack colorPalette="teal">
-        <Spinner size="xl" color="colorPalette.600" />
-        <Text color="colorPalette.600">Loading...</Text>
-      </VStack>
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <VStack colorPalette="teal">
+          <Spinner size="xl" color="colorPalette.600" />
+          <Text color="colorPalette.600">Loading...</Text>
+        </VStack>
+      </Box>
     )
   }
 
@@ -56,19 +62,20 @@ function App() {
         <Routes>
           <Route path="/" element={<DashboardPage />}></Route>
           <Route path="/expenseList" element={<ExpenseListPage />}></Route>
-          <Route path="/expenseList/expenseFrom/:id" element={<ExpenseFormPage />}></Route>
-          <Route path="/logout" element={<LogoutPage onClickBackToTop={() => auth.removeUser()}/>}></Route>
+          <Route path="/expenseForm" element={<ExpenseFormPage />}></Route>
+          <Route path="/logout" element={<LogoutPage onClickBackToTop={backToHome} />}></Route>
         </Routes>
         </Box>
       </BrowserRouter>
     );
   }
   return (
-    <div>
-      <button onClick={() => auth.signinRedirect()}>Sign in</button>
-      <button onClick={() => signOutRedirect()}>Sign out</button>
-    </div>
-
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage onSignIn={() => auth.signinRedirect()} />} />
+        {/* <Route path="/logout" element={<LogoutPage onClickBackToTop={backToHome} />} /> */}
+      </Routes>
+    </BrowserRouter>
   )
 }
 
