@@ -1,4 +1,4 @@
-import { Box, Button, Container, Heading, Text, VStack, HStack, SimpleGrid, Stack } from "@chakra-ui/react"
+import { Box, Button, Container, Heading, Text, VStack, SimpleGrid } from "@chakra-ui/react"
 import { FaChartPie, FaWallet, FaMobileAlt, FaShieldAlt } from "react-icons/fa"
 
 type HomePageProps = {
