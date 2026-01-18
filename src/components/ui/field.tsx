@@ -2,7 +2,7 @@ import { Field as ChakraField } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
 export interface FieldProps {
-  label?: string
+  label?: ReactNode
   required?: boolean
   invalid?: boolean
   errorText?: string

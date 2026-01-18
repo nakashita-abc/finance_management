@@ -13,7 +13,7 @@ export const UserMenu = () => {
 
   const signOutRedirect = () => {
     const clientId = "22omuoadoaf3b2t1in154vjn9e"
-    const logoutUri = "https://main.d28mj8dz6wqkv9.amplifyapp.com/logout"
+    const logoutUri = "http://localhost:5173/logout"
     const cognitoDomain = "https://us-east-1huyvdb3aw.auth.us-east-1.amazoncognito.com"
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(
       logoutUri
