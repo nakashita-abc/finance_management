@@ -1,6 +1,7 @@
-import { IconButton, Table, Badge, Box, Text } from "@chakra-ui/react"
+import { IconButton, Table, Badge, Box, Text, HStack, Button } from "@chakra-ui/react"
 import { IoMdCreate } from "react-icons/io"
 import { TfiClose } from "react-icons/tfi"
+import { useState } from "react"
 
 // カテゴリごとの色
 const CATEGORY_COLORS: Record<string, string> = {
@@ -18,6 +19,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 // ロジックは呼び出しもとで行う
 export const ExpenseList = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const expenses = [
     { id: 1, date: "2025-01-05", category: "食費", description: "スーパーで食材購入", amount: 3200 },
@@ -32,6 +34,14 @@ export const ExpenseList = () => {
     { id: 10, date: "2025-01-14", category: "交際費", description: "飲み会", amount: 4500 },
   ]
 
+  // ユニークなカテゴリを取得
+  const categories = [...new Set(expenses.map((e) => e.category))]
+
+  // フィルタリング
+  const filteredExpenses = selectedCategory
+    ? expenses.filter((e) => e.category === selectedCategory)
+    : expenses
+
   const handleEdit = (id: number) => {
     alert("API未実装です")
     console.log("編集ID:", id)
@@ -43,20 +53,54 @@ export const ExpenseList = () => {
   }
 
   // 合計金額を計算
-  const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0)
 
   return (
     <Box>
+      {/* カテゴリフィルター */}
+      <Box mb={4}>
+        <Text fontSize="sm" color="gray.600" mb={2} fontWeight="medium">
+          カテゴリで絞り込み
+        </Text>
+        <HStack gap={2} flexWrap="wrap">
+          <Button
+            size="sm"
+            variant={selectedCategory === null ? "solid" : "outline"}
+            bg={selectedCategory === null ? "purple.600" : "transparent"}
+            color={selectedCategory === null ? "white" : "gray.600"}
+            borderColor="gray.300"
+            _hover={{
+              bg: selectedCategory === null ? "purple.700" : "gray.100",
+            }}
+            onClick={() => setSelectedCategory(null)}
+          >
+            すべて
+          </Button>
+          {categories.map((category) => (
+            <Button
+              key={category}
+              size="sm"
+              variant={selectedCategory === category ? "solid" : "outline"}
+              colorScheme={CATEGORY_COLORS[category] || "gray"}
+              bg={selectedCategory === category ? undefined : "transparent"}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </Button>
+          ))}
+        </HStack>
+      </Box>
+
       {/* 合計金額表示 */}
       <Box mb={4} p={4} bg="purple.50" borderRadius="md" borderWidth="1px" borderColor="purple.200">
         <Text fontSize="sm" color="gray.600" mb={1}>
-          合計支出
+          {selectedCategory ? `${selectedCategory}の合計` : "合計支出"}
         </Text>
         <Text fontSize="3xl" fontWeight="bold" color="purple.600">
           ¥{totalAmount.toLocaleString()}
         </Text>
         <Text fontSize="xs" color="gray.500">
-          {expenses.length}件の支出
+          {filteredExpenses.length}件の支出
         </Text>
       </Box>
 
@@ -77,7 +121,7 @@ export const ExpenseList = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {expenses.map((item) => (
+            {filteredExpenses.map((item) => (
               <Table.Row
                 key={item.id}
                 bg="white"

@@ -136,14 +136,29 @@ const FeatureCard = ({ icon, title, description, color }: FeatureCardProps) => {
       p={8}
       borderRadius="xl"
       shadow="md"
-      _hover={{ shadow: "xl", transform: "translateY(-4px)" }}
-      transition="all 0.3s"
+      _hover={{
+        shadow: "2xl",
+        transform: "translateY(-8px)",
+        borderColor: color,
+      }}
+      transition="all 0.3s ease"
       align="start"
       gap={4}
+      borderWidth="2px"
+      borderColor="transparent"
+      cursor="pointer"
     >
-      <Box color={color}>{icon}</Box>
-      <Heading fontSize="xl">{title}</Heading>
-      <Text color="gray.600" fontSize="sm" lineHeight="1.7">
+      <Box
+        color={color}
+        p={3}
+        bg={`${color.split('.')[0]}.50`}
+        borderRadius="lg"
+        transition="all 0.3s"
+      >
+        {icon}
+      </Box>
+      <Heading fontSize="xl" color="gray.800">{title}</Heading>
+      <Text color="gray.600" fontSize="sm" lineHeight="1.8">
         {description}
       </Text>
     </VStack>

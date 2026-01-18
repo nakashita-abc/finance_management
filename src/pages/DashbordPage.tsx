@@ -142,7 +142,13 @@ export const DashboardPage = () => {
       {/* サマリーカード */}
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={6} mb={8}>
         {/* 今月の支出 */}
-        <Card.Root bg="gradient-to-br from-purple-500 to-purple-600" color="white">
+        <Card.Root
+          bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+          color="white"
+          shadow="lg"
+          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+          transition="all 0.3s"
+        >
           <Card.Body>
             <HStack justify="space-between" mb={2}>
               <Text fontSize="sm" opacity={0.9}>
@@ -159,7 +165,13 @@ export const DashboardPage = () => {
         </Card.Root>
 
         {/* 予算 */}
-        <Card.Root bg="gradient-to-br from-blue-500 to-blue-600" color="white">
+        <Card.Root
+          bg="linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)"
+          color="white"
+          shadow="lg"
+          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+          transition="all 0.3s"
+        >
           <Card.Body>
             <HStack justify="space-between" mb={2}>
               <Text fontSize="sm" opacity={0.9}>
@@ -176,7 +188,13 @@ export const DashboardPage = () => {
         </Card.Root>
 
         {/* 残り予算 */}
-        <Card.Root bg="gradient-to-br from-green-500 to-green-600" color="white">
+        <Card.Root
+          bg="linear-gradient(135deg, #10B981 0%, #059669 100%)"
+          color="white"
+          shadow="lg"
+          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+          transition="all 0.3s"
+        >
           <Card.Body>
             <HStack justify="space-between" mb={2}>
               <Text fontSize="sm" opacity={0.9}>
@@ -193,7 +211,13 @@ export const DashboardPage = () => {
         </Card.Root>
 
         {/* 予算達成率 */}
-        <Card.Root bg="gradient-to-br from-orange-500 to-orange-600" color="white">
+        <Card.Root
+          bg="linear-gradient(135deg, #F59E0B 0%, #D97706 100%)"
+          color="white"
+          shadow="lg"
+          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
+          transition="all 0.3s"
+        >
           <Card.Body>
             <HStack justify="space-between" mb={2}>
               <Text fontSize="sm" opacity={0.9}>
