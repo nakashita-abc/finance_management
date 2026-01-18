@@ -12,9 +12,9 @@ export const UserMenu = () => {
   const { email } = context
 
   const signOutRedirect = () => {
-    const clientId = "22omuoadoaf3b2t1in154vjn9e"
-    const logoutUri = "http://localhost:5173/logout"
-    const cognitoDomain = "https://us-east-1huyvdb3aw.auth.us-east-1.amazoncognito.com"
+    const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID
+    const logoutUri = import.meta.env.VITE_LOGOUT_REDIRECT_URI
+    const cognitoDomain = import.meta.env.VITE_COGNITO_DOMAIN
     window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(
       logoutUri
     )}`

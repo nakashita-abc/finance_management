@@ -1,5 +1,5 @@
-import { Box, Button, Container, Heading, Text, VStack, SimpleGrid } from "@chakra-ui/react"
-import { FaChartPie, FaWallet, FaMobileAlt, FaShieldAlt } from "react-icons/fa"
+import { Box, Button, Container, Heading, Text, VStack, SimpleGrid, HStack, Icon, Link } from "@chakra-ui/react"
+import { FaChartPie, FaWallet, FaMobileAlt, FaShieldAlt, FaGithub } from "react-icons/fa"
 
 type HomePageProps = {
   onSignIn: () => void
@@ -113,9 +113,25 @@ export const HomePage = ({ onSignIn }: HomePageProps) => {
       {/* Footer */}
       <Box bg="gray.800" color="gray.400" py={8}>
         <Container maxW="container.xl">
-          <Text textAlign="center" fontSize="sm">
-            © 2025 Finance Management. All rights reserved.
-          </Text>
+          <VStack gap={4}>
+            <Link
+              href="https://github.com/nakashita-abc/finance_management"
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ color: "white", transform: "scale(1.1)" }}
+              transition="all 0.2s"
+            >
+              <HStack gap={2}>
+                <Icon fontSize="xl">
+                  <FaGithub />
+                </Icon>
+                <Text fontSize="sm">View on GitHub</Text>
+              </HStack>
+            </Link>
+            <Text textAlign="center" fontSize="sm">
+              © 2025 Finance Management. All rights reserved.
+            </Text>
+          </VStack>
         </Container>
       </Box>
     </Box>
