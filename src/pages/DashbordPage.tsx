@@ -1,5 +1,4 @@
-import { Box, Container, SimpleGrid, Text, Card, Heading, HStack, Icon } from "@chakra-ui/react"
-import { Doughnut, Line } from "react-chartjs-2"
+import { Container, SimpleGrid } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -10,55 +9,135 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js"
-import { FaWallet, FaChartLine, FaMoneyBillWave, FaCalendarAlt } from "react-icons/fa"
+} from "chart.js";
+import { FaWallet, FaChartLine, FaMoneyBillWave } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useAuth } from "react-oidc-context";
+import { DashbordSummaryCard } from "@/components/dashbord/DashbordSummaryCard";
+import { DashbordHeader } from "@/components/dashbord/DashbordHeader";
+import { DoughnutChart } from "@/components/dashbord/charts/DoughnutChart";
+import { LineChart } from "@/components/dashbord/charts/LineChart";
 
 // Chart.jsの登録
-ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+);
+
+type DashboardResponse = {
+  summary: {
+    expenseTotal: number;
+    incomeTotal: number;
+    incomeExpenseDiff: number;
+  };
+  charts: {
+    categoryExpenses: { category: string; amount: number }[];
+    monthlyTrend: {
+      yearMonth: string;
+      expenseTotal: number;
+      incomeTotal: number;
+      incomeExpenseDiff: number;
+    }[];
+  };
+};
 
 export const DashboardPage = () => {
-  // モックデータ
-  const totalExpense = 24710
-  const budget = 50000
-  const remainingBudget = budget - totalExpense
-  const currentMonth = "2025年1月"
+  const auth = useAuth();
+  const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      const token = auth.user?.id_token;
+      const res = await fetch(
+        import.meta.env.VITE_DASHBORD_API_URL as string,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await res.json();
+      setDashboard(data);
+    };
+
+    if (!auth.isAuthenticated) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      fetchDashboardData();
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("予期しないエラーが発生しました");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [auth.isAuthenticated]);
+
+  const totalExpense: number = dashboard?.summary.expenseTotal || 0;
+  const totalIncome: number = dashboard?.summary.incomeTotal || 0;
+  const incomeExpenseDiff: number = dashboard?.summary.incomeExpenseDiff || 0;
+  const currentMonth: string = new Date().toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+  });
 
   // カテゴリ別データ
+  const CATEGORY_COLORS = [
+    "#3B82F6", // 青
+    "#10B981", // 緑
+    "#A855F7", // 紫
+    "#EC4899", // ピンク
+    "#06B6D4", // シアン
+    "#EF4444", // 赤
+    "#14B8A6", // ティール
+    "#F59E0B", // 黄
+  ];
+
+  const categoryExpenses = dashboard?.charts.categoryExpenses ?? [];
   const categoryData = {
-    labels: ["食費", "交通費", "日用品", "娯楽", "通信費", "医療費", "衣服", "交際費"],
+    labels: categoryExpenses.map((c) => c.category),
     datasets: [
       {
-        data: [3760, 480, 1250, 1900, 6800, 2100, 2980, 4500],
-        backgroundColor: [
-          "#3B82F6", // 青
-          "#10B981", // 緑
-          "#A855F7", // 紫
-          "#EC4899", // ピンク
-          "#06B6D4", // シアン
-          "#EF4444", // 赤
-          "#14B8A6", // ティール
-          "#F59E0B", // 黄
-        ],
+        data: categoryExpenses.map((c) => c.amount),
+        backgroundColor: CATEGORY_COLORS,
         borderWidth: 0,
       },
     ],
-  }
+  };
+  console.log("categoryData:", categoryData);
 
-  // 月次推移データ
+  const monthlyTrend = dashboard?.charts.monthlyTrend ?? [];
   const monthlyData = {
-    labels: ["9月", "10月", "11月", "12月", "1月"],
+    labels: monthlyTrend.map((m) => {
+      const month = parseInt(m.yearMonth.split("-")[1], 10);
+      return `${month}月`;
+    }),
     datasets: [
       {
         label: "支出",
-        data: [32000, 28500, 31200, 29800, 24710],
+        data: monthlyTrend.map((m) => m.expenseTotal),
         borderColor: "#8B5CF6",
         backgroundColor: "rgba(139, 92, 246, 0.1)",
         tension: 0.4,
         fill: true,
       },
       {
-        label: "予算",
-        data: [50000, 50000, 50000, 50000, 50000],
+        label: "収入",
+        data: monthlyTrend.map((m) => m.incomeTotal),
         borderColor: "#10B981",
         backgroundColor: "rgba(16, 185, 129, 0.1)",
         tension: 0,
@@ -66,200 +145,43 @@ export const DashboardPage = () => {
         fill: false,
       },
     ],
-  }
-
-  const doughnutOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "right" as const,
-        labels: {
-          padding: 15,
-          font: {
-            size: 12,
-          },
-        },
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context: any) {
-            const label = context.label || ""
-            const value = context.parsed || 0
-            return `${label}: ¥${value.toLocaleString()}`
-          },
-        },
-      },
-    },
-  }
-
-  const lineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context: any) {
-            const label = context.dataset.label || ""
-            const value = context.parsed.y || 0
-            return `${label}: ¥${value.toLocaleString()}`
-          },
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: function (value: any) {
-            return "¥" + value.toLocaleString()
-          },
-        },
-      },
-    },
-  }
+  };
+  console.log("monthlyData:", monthlyData);
 
   return (
     <Container maxW="container.xl" py={8}>
-      {/* 月表示 */}
-      <HStack mb={6} justify="space-between" align="center">
-        <Heading fontSize={{ base: "2xl", md: "3xl" }} color="gray.800">
-          ダッシュボード
-        </Heading>
-        <HStack gap={2} color="purple.600">
-          <Icon fontSize="xl">
-            <FaCalendarAlt />
-          </Icon>
-          <Text fontSize="lg" fontWeight="semibold">
-            {currentMonth}
-          </Text>
-        </HStack>
-      </HStack>
-
-      {/* サマリーカード */}
+      <DashbordHeader currentMonth={currentMonth} />
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={6} mb={8}>
-        {/* 今月の支出 */}
-        <Card.Root
-          bg="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-          color="white"
-          shadow="lg"
-          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
-          transition="all 0.3s"
-        >
-          <Card.Body>
-            <HStack justify="space-between" mb={2}>
-              <Text fontSize="sm" opacity={0.9}>
-                今月の支出
-              </Text>
-              <Icon fontSize="2xl" opacity={0.8}>
-                <FaMoneyBillWave />
-              </Icon>
-            </HStack>
-            <Text fontSize="3xl" fontWeight="bold">
-              ¥{totalExpense.toLocaleString()}
-            </Text>
-          </Card.Body>
-        </Card.Root>
-
-        {/* 予算 */}
-        <Card.Root
-          bg="linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)"
-          color="white"
-          shadow="lg"
-          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
-          transition="all 0.3s"
-        >
-          <Card.Body>
-            <HStack justify="space-between" mb={2}>
-              <Text fontSize="sm" opacity={0.9}>
-                月予算
-              </Text>
-              <Icon fontSize="2xl" opacity={0.8}>
-                <FaWallet />
-              </Icon>
-            </HStack>
-            <Text fontSize="3xl" fontWeight="bold">
-              ¥{budget.toLocaleString()}
-            </Text>
-          </Card.Body>
-        </Card.Root>
-
-        {/* 残り予算 */}
-        <Card.Root
-          bg="linear-gradient(135deg, #10B981 0%, #059669 100%)"
-          color="white"
-          shadow="lg"
-          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
-          transition="all 0.3s"
-        >
-          <Card.Body>
-            <HStack justify="space-between" mb={2}>
-              <Text fontSize="sm" opacity={0.9}>
-                残り予算
-              </Text>
-              <Icon fontSize="2xl" opacity={0.8}>
-                <FaChartLine />
-              </Icon>
-            </HStack>
-            <Text fontSize="3xl" fontWeight="bold">
-              ¥{remainingBudget.toLocaleString()}
-            </Text>
-          </Card.Body>
-        </Card.Root>
-
-        {/* 予算達成率 */}
-        <Card.Root
-          bg="linear-gradient(135deg, #F59E0B 0%, #D97706 100%)"
-          color="white"
-          shadow="lg"
-          _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
-          transition="all 0.3s"
-        >
-          <Card.Body>
-            <HStack justify="space-between" mb={2}>
-              <Text fontSize="sm" opacity={0.9}>
-                予算使用率
-              </Text>
-              <Icon fontSize="2xl" opacity={0.8}>
-                <FaChartLine />
-              </Icon>
-            </HStack>
-            <Text fontSize="3xl" fontWeight="bold">
-              {Math.round((totalExpense / budget) * 100)}%
-            </Text>
-          </Card.Body>
-        </Card.Root>
+        <DashbordSummaryCard
+          title="今月の支出"
+          value={"¥" + totalExpense.toLocaleString()}
+          icon={<FaMoneyBillWave />}
+        />
+        <DashbordSummaryCard
+          title="月の収入"
+          value={"¥" + totalIncome.toLocaleString()}
+          icon={<FaWallet />}
+        />
+        <DashbordSummaryCard
+          title="収支差額"
+          value={"¥" + incomeExpenseDiff.toLocaleString()}
+          icon={<FaChartLine />}
+        />
+        <DashbordSummaryCard
+          title="予算使用率"
+          value={
+            totalIncome > 0
+              ? Math.round((totalExpense / totalIncome) * 100) + "%"
+              : "0%"
+          }
+          icon={<FaChartLine />}
+        />
       </SimpleGrid>
 
-      {/* グラフエリア */}
       <SimpleGrid columns={{ base: 1, lg: 2 }} gap={6}>
-        {/* カテゴリ別円グラフ */}
-        <Card.Root>
-          <Card.Body>
-            <Card.Title mb={4} fontSize="xl" color="gray.800">
-              カテゴリ別支出
-            </Card.Title>
-            <Box h="350px">
-              <Doughnut data={categoryData} options={doughnutOptions} />
-            </Box>
-          </Card.Body>
-        </Card.Root>
-
-        {/* 月次推移グラフ */}
-        <Card.Root>
-          <Card.Body>
-            <Card.Title mb={4} fontSize="xl" color="gray.800">
-              月次推移
-            </Card.Title>
-            <Box h="350px">
-              <Line data={monthlyData} options={lineOptions} />
-            </Box>
-          </Card.Body>
-        </Card.Root>
+        <DoughnutChart categoryData={categoryData} />
+        <LineChart data={monthlyData} />
       </SimpleGrid>
     </Container>
-  )
-}
+  );
+};

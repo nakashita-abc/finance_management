@@ -144,91 +144,11 @@ Finance Management（家計管理アプリ）
 ### 開発ツール
 | ツール | 用途 |
 |-------|------|
-| ESLint | コード品質チェック |
-| TypeScript ESLint | TypeScript用Lintルール |
 | Git | バージョン管理 |
 | Vite TSConfig Paths | パスエイリアス解決 |
 
 ---
 
-## データモデル
-
-### DynamoDB テーブル設計
-
-#### シングルテーブル設計
-テーブル名: `Expenses`（想定）
-
-| 属性名 | 型 | 説明 |
-|-------|---|------|
-| **PK** (Partition Key) | String | `user_id` - ユーザーID（Cognito Sub） |
-| **SK** (Sort Key) | String | `yearMonth#id` - 年月とIDの複合キー（例: `2025-01#uuid-123`） |
-| date | String | 支出日（YYYY-MM-DD） |
-| category | String | カテゴリ名 |
-| title | String | 支出のタイトル/説明 |
-| amount | Number | 金額 |
-| createdAt | String | 作成日時（ISO 8601） |
-| updatedAt | String | 更新日時（ISO 8601） |
-
-#### アクセスパターン
-
-**1. ユーザーの特定月の全支出を取得**
-```
-PK = user_id
-SK begins_with "2025-01#"
-```
-
-**2. ユーザーの特定の支出を取得**
-```
-PK = user_id
-SK = "2025-01#uuid-123"
-```
-
-**3. ユーザーの全支出を取得**
-```
-PK = user_id
-```
-
-### データ型定義（TypeScript）
-
-```typescript
-// Expense エンティティ
-type Expense = {
-  id: string;          // 支出ID（UUID）
-  date: string;        // 日付（YYYY-MM-DD）
-  category: string;    // カテゴリ
-  title: string;       // タイトル/説明
-  amount: number;      // 金額
-}
-
-// UserProfile
-type UserProfile = {
-  email: string;       // メールアドレス
-  userId: string;      // ユーザーID（Cognito Sub）
-  createdAt: string;   // 作成日時
-}
-
-// MonthlyCategorySummary（月次集計）
-type MonthlyCategorySummary = {
-  yearMonth: string;             // 年月（YYYY-MM）
-  totalAmount: number;           // 合計金額
-  categories: {
-    name: string;                // カテゴリ名
-    amount: number;              // カテゴリ別金額
-  }[];
-}
-```
-
-### カテゴリ一覧
-- 食費
-- 交通費
-- 交際費
-- 日用品
-- 娯楽
-- 通信費
-- 電気・水道・ガス
-- 医療費
-- 衣服
-- その他
 
 ---
 
@@ -370,38 +290,6 @@ finance_management/
 - **Custom Hooks**: ロジックの再利用
 
 ---
-
-## API設計
-
-### ベースURL
-```
-https://9vnts8haqd.execute-api.us-east-1.amazonaws.com
-```
-
-### 主要エンドポイント
-
-#### 月次カテゴリ集計取得
-```
-GET /dashboard/getMonthlyCategorySummary
-```
-
-**リクエストヘッダー**:
-```
-Authorization: Bearer {idToken}
-```
-
-**レスポンス例**:
-```json
-{
-  "yearMonth": "2025-01",
-  "totalAmount": 20000,
-  "categories": [
-    { "name": "食費", "amount": 3200 },
-    { "name": "交通費", "amount": 480 },
-    { "name": "交際費", "amount": 980 }
-  ]
-}
-```
 
 ---
 
