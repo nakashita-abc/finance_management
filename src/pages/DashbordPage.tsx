@@ -17,6 +17,7 @@ import { DashbordSummaryCard } from "@/components/dashbord/DashbordSummaryCard";
 import { DashbordHeader } from "@/components/dashbord/DashbordHeader";
 import { DoughnutChart } from "@/components/dashbord/charts/DoughnutChart";
 import { LineChart } from "@/components/dashbord/charts/LineChart";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 // Chart.jsの登録
 ChartJS.register(
@@ -50,8 +51,7 @@ type DashboardResponse = {
 export const DashboardPage = () => {
   const auth = useAuth();
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading,setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -73,15 +73,11 @@ export const DashboardPage = () => {
 
     try {
       setLoading(true);
-      setError(null);
 
       fetchDashboardData();
     } catch (e: unknown) {
       if (e instanceof Error) {
-        setError(e.message);
-      } else {
-        setError("予期しないエラーが発生しました");
-      }
+      } 
     } finally {
       setLoading(false);
     }
@@ -118,7 +114,6 @@ export const DashboardPage = () => {
       },
     ],
   };
-  console.log("categoryData:", categoryData);
 
   const monthlyTrend = dashboard?.charts.monthlyTrend ?? [];
   const monthlyData = {
@@ -182,6 +177,7 @@ export const DashboardPage = () => {
         <DoughnutChart categoryData={categoryData} />
         <LineChart data={monthlyData} />
       </SimpleGrid>
+      {loading && <LoadingSpinner />}
     </Container>
   );
 };
