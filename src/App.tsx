@@ -12,6 +12,7 @@ import { Spinner, VStack, Text, Box, Button, Container, Heading, HStack, Icon } 
 import { FaExclamationTriangle, FaHome, FaRedo } from 'react-icons/fa'
 import { useContext } from 'react'
 import { ProfileContext } from './providers/ProfileProvider'
+import { CreateIncomePage } from './pages/CreateIncomePage'
 
 function App() {
   const auth = useAuth();
@@ -142,6 +143,7 @@ function App() {
           <Route path="/" element={<DashboardPage />}></Route>
           <Route path="/expenseList" element={<ExpenseListPage />}></Route>
           <Route path="/expenseForm" element={<ExpenseFormPage />}></Route>
+          <Route path="/incomeForm" element={<CreateIncomePage />}></Route>
           <Route path="/logout" element={<LogoutPage onClickBackToTop={backToHome} />}></Route>
         </Routes>
         </Box>

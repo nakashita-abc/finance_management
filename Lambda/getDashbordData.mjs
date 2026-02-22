@@ -6,7 +6,7 @@ const dynamo = DynamoDBDocumentClient.from(client);
 
 const tableName = "portfolio-FinanceManagement";
 
-const FIXED_CATEGORIES = ["食費","交通費","日用品","娯楽","通信費","医療費","衣服","交際費"];
+const FIXED_CATEGORIES = ["食費", "交通費", "日用品", "娯楽", "通信費", "医療費", "衣服", "交際費"];
 
 function getNowYearMonthJst() {
   const jst = new Date(Date.now() + 9 * 60 * 60 * 1000);
@@ -90,17 +90,25 @@ const buildSummary = (ym, monthMap) => {
   };
 };
 
+// CORS headers
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+};
+
 export const handler = async (event) => {
   const ym = getNowYearMonthJst();
   const months = 6;
 
   let body;
   let statusCode = 200;
-  const headers = { "Content-Type": "application/json; charset=utf-8" };
 
   try {
     // Cognito認証からuserIdを取得（HTTP API v2 の JWT Authorizer）
     const userId = event.requestContext?.authorizer?.jwt?.claims?.sub;
+    console.log("userID:", userId)
     if (!userId) {
       return {
         statusCode: 401,
