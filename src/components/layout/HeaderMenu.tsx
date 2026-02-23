@@ -41,9 +41,10 @@ export const HeaderMenu = () => {
 
   const menuItems = [
     { to: '/', icon: <FaChartPie />, label: 'ダッシュボード' },
+    { to: '/expenseForm', icon: <FaPlusCircle />, label: '支出登録' },
     { to: '/incomeForm', icon: <FaPlusCircle />, label: '収入登録' },
     { to: '/expenseList', icon: <FaListUl />, label: '支出一覧' },
-    { to: '/incomeForm', icon: <FaListUl />, label: '収入一覧' },
+    
   ]
 
   return (
